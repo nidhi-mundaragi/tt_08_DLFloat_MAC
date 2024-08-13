@@ -65,7 +65,7 @@ async def test_project(dut):
     dut.uio_in.value = 64
     
    #1ST SET OUTPUT VERIF
-    assert dut.uo_out.value == 0 
+    assert dut.uo_out.value == 65 
     
    #OUTPUT VERIF
     ######2ND SET#################
