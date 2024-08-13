@@ -64,9 +64,9 @@ async def test_project(dut):
     dut.ui_in.value = 0
     dut.uio_in.value = 64
     
-   #1ST SET OUTPUT VERIF
+    #1ST SET OUTPUT VERIF
     assert dut.uo_out.value == 65 
-     await ClockCycles(dut.clk, 1)
+    await ClockCycles(dut.clk, 1)
     ######5TH SET###############
      # Set the input values a4=1
     dut.ui_in.value = 0
