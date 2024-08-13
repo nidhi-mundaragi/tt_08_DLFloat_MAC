@@ -254,6 +254,11 @@ module dlfloat_adder(input clk, input [15:0]a1, input [15:0]b1, output reg[15:0]
       
 	 //renormalization for mantissa and exponent
      //stage 4
+	  //to avoid latch inference
+	   renorm_exp_80=4'd0;
+	   renorm_shift_80=9'd0;
+	   Add1_mant_80=Add1_mant_80;
+	  
         if (Add_mant_80[10] ) begin
 		   Add1_mant_80= Add_mant_80 >> 1;
 		   renorm_exp_80 = 4'd1;
@@ -303,11 +308,12 @@ module dlfloat_adder(input clk, input [15:0]a1, input [15:0]b1, output reg[15:0]
         
         end
      
-      
+        Final_expo_80 = 6'd0;//to avoid latch inference
         Final_expo_80 =  Larger_exp_80 + renorm_exp_80;
-	
+	 Final_mant_80 = 9'd0;//to avoid latch inference
         Final_mant_80 = Add1_mant_80[8:0]; 
 
+	  Final_sign_80=0;//to avoid latch inference
 	   if (s1_80 == s2_80) begin
 		  Final_sign_80 = s1_80;
 	   end 
