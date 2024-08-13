@@ -183,11 +183,13 @@ module dlfloat_adder(input clk, input [15:0]a1, input [15:0]b1, output reg[15:0]
         //stage 1
 	     e1_80 = a1[14:9];
 	     e2_80 = b1[14:9];
-          m1_80 = a1[8:0];
-	      m2_80 = b1[8:0];
-          s1_80 = a1[15];
-	      s2_80 = b1[15];
-        
+             m1_80 = a1[8:0];
+	     m2_80 = b1[8:0];
+             s1_80 = a1[15];
+	     s2_80 = b1[15];
+
+	  Num_shift_80=16'b0;
+	  
           if (e1_80  > e2_80) begin
              Num_shift_80           = e1_80 - e2_80;
              Larger_exp_80          = e1_80;                     
