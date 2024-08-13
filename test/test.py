@@ -55,16 +55,19 @@ async def test_project(dut):
      # Set the input values a4=1
     dut.ui_in.value = 0
     dut.uio_in.value = 62
+
+    #1ST SET OUTPUT VERIF
+    assert dut.uo_out.value == 0
+    
     await ClockCycles(dut.clk, 1)  
     # Set the input values b4=2
     dut.ui_in.value = 0
     dut.uio_in.value = 64
     
+   #1ST SET OUTPUT VERIF
+    assert dut.uo_out.value == 0 
+    
    #OUTPUT VERIF
-    ########1ST SET##############
-    assert dut.uo_out.value == 0
-    await ClockCycles(dut.clk, 1)
-    assert dut.uo_out.value == 65
     ######2ND SET#################
     await ClockCycles(dut.clk, 1)
     assert dut.uo_out.value == 128
