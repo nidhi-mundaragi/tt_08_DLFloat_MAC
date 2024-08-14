@@ -35,13 +35,9 @@ async def test_project(dut):
     await ClockCycles(dut.clk, 1)
     
     
-    
-
-   
-    
    #OUTPUT VERIF
     
-    await ClockCycles(dut.clk, 5)
+    await ClockCycles(dut.clk, 6)
     assert dut.uo_out.value == 0
     await ClockCycles(dut.clk, 1)
     assert dut.uo_out.value == 65
