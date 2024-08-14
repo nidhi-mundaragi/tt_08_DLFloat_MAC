@@ -120,14 +120,14 @@ endmodule
 		end
   end
 	
-  dlfloat_mult mul(a,b,fprod,clk);
+	 dlfloat_mult mul(a,b,fprod,clk,rst_n);
   dlfloat_adder add(clk,fprod,c_out,fadd);
 
 endmodule 
 
-module dlfloat_mult(a,b,c_mul,clk);
+module dlfloat_mult(a,b,c_mul,clk,rst_n);
     input  [15:0]a,b;
-    input clk;
+    input clk,rst_n;
     output  reg[15:0]c_mul;
     
     reg [9:0]ma,mb; //1 extra because 1.smthng
