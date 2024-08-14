@@ -120,12 +120,12 @@ endmodule
 		end
   end
 	
-	 dlfloat_mult mul(a,b,fprod,clk);
+	 dlfloat_mult mul(a,b,fprod,clk,rst_n);
   dlfloat_adder add(clk,fprod,c_out,fadd);
 
 endmodule 
 
-module dlfloat_mult(a,b,c_mul,clk);
+module dlfloat_mult(a,b,c_mul,clk,rst_n);
     input  [15:0]a,b;
     input clk;
     output  reg[15:0]c_mul;
@@ -136,9 +136,18 @@ module dlfloat_mult(a,b,c_mul,clk);
     reg [5:0] ea,eb,e_temp,exp;
     reg sa,sb,s;
     reg [16:0] temp;
-
+    reg [15:0] c_mul1;
    
-	always@(posedge clk) begin
+  always @(posedge clk) begin
+    if(!rst_n) begin
+      c_mul<=16'b0;
+    end
+    else begin
+      c_mul<=c_mul1;
+    end
+  end	
+	
+	always@(*) begin
         ma ={1'b1,a[8:0]};
         mb= {1'b1,b[8:0]};
         sa = a[15];
@@ -154,10 +163,10 @@ module dlfloat_mult(a,b,c_mul,clk);
 		
         s=sa ^ sb;
          if( a==16'hFFFF | b==16'hFFFF ) begin
-        c_mul =16'hFFFF;
+        c_mul1 =16'hFFFF;
       end
       else begin
-        c_mul = (a==0 | b==0) ? 0 :{s,exp,mant};
+        c_mul1 = (a==0 | b==0) ? 0 :{s,exp,mant};
       end 
  
     end 
