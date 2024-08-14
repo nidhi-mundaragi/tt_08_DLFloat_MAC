@@ -145,17 +145,13 @@ module dlfloat_mult(a,b,c_mul,clk);
         sb = b[15];
         ea = a[14:9];
         eb = b[14:9];
-      
-	assign e_temp=6'b0;//to avoid latch inference
-	assign m_temp=20'b0;	
+	
         e_temp = ea + eb - 31;
         m_temp = ma * mb;
-
-	assign mant=9'b0;
-        assign exp=6'b0;		
+		
         mant = m_temp[19] ? m_temp[18:10] : m_temp[17:9];
         exp = m_temp[19] ? e_temp+1'b1 : e_temp;
-        assign s=0;
+		
         s=sa ^ sb;
          if( a==16'hFFFF | b==16'hFFFF ) begin
         c_mul =16'hFFFF;
