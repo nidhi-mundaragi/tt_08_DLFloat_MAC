@@ -79,7 +79,7 @@ async def test_project(dut):
     
     #2ND SET OUTPUT VERIF
     assert dut.uo_out.value == 128
-     await ClockCycles(dut.clk, 1)  
+    await ClockCycles(dut.clk, 1)  
     
     
    #OUTPUT VERIF
