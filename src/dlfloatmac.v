@@ -128,7 +128,7 @@ endmodule
 module dlfloat_mult(a,b,c_mul,clk);
     input  [15:0]a,b;
     input clk;
-  output  reg[15:0]c_mul=0;
+    output  reg[15:0]c_mul;
     
     reg [9:0]ma,mb; //1 extra because 1.smthng
     reg [8:0] mant;
@@ -136,29 +136,42 @@ module dlfloat_mult(a,b,c_mul,clk);
     reg [5:0] ea,eb,e_temp,exp;
     reg sa,sb,s;
     reg [16:0] temp;
+    reg [15:0] c_mul1;
    
+    always @(posedge clk) begin
+      if(!rst_n) begin
+        c_mul<=16'b0;
+      end
+      else begin
+        c_mul<=c_mul1;
+      end
+     end
 
 
-  always@(posedge clk) begin
+	always@(*) begin
         ma ={1'b1,a[8:0]};
         mb= {1'b1,b[8:0]};
         sa = a[15];
         sb = b[15];
         ea = a[14:9];
         eb = b[14:9];
-
+      
+	assign e_temp=6'b0;//to avoid latch inference
+	assign m_temp=20'b0;	
         e_temp = ea + eb - 31;
         m_temp = ma * mb;
 
+	assign mant=9'b0;
+        assign exp=6'b0;		
         mant = m_temp[19] ? m_temp[18:10] : m_temp[17:9];
         exp = m_temp[19] ? e_temp+1'b1 : e_temp;
-
+        assign s=0;
         s=sa ^ sb;
          if( a==16'hFFFF | b==16'hFFFF ) begin
-        c_mul =16'hFFFF;
+        c_mul1 =16'hFFFF;
       end
       else begin
-        c_mul = (a==0 | b==0) ? 0 :{s,exp,mant};
+        c_mul1 = (a==0 | b==0) ? 0 :{s,exp,mant};
       end 
  
     end 
