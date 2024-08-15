@@ -172,12 +172,9 @@ module dlfloat_mult(a,b,c_mul,clk,rst_n);
     end 
 endmodule 
 
-module dlfloat_adder(clk,a1,b1,c_add);
+module dlfloat_adder(input clk,input [15:0] a1, input [15:0] b1,output reg [15:0] c_add=0);
 
-   input clk;
-   input [15:0]a1,b1;
-   output reg [15:0]c_add;	
-    
+   	
     reg    [15:0] Num_shift_80; 
     reg    [5:0]  Larger_exp_80,Final_expo_80;
     reg    [9:0] Small_exp_mantissa_80,S_mantissa_80,L_mantissa_80,Large_mantissa_80;
