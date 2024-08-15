@@ -9,7 +9,7 @@ module tb ();
   // Dump the signals to a VCD file. You can view it with gtkwave.
   initial begin
     $dumpfile("tb.vcd");
-    $dumpvars(0, tb);
+     $dumpvars(0, dut);
     #1;
   end
 
