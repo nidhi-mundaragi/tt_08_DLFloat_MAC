@@ -176,7 +176,7 @@ module dlfloat_adder(clk,a1,b1,c_add);
 
    input clk;
    input [15:0]a1,b1;
-   output reg [15:0]c_add	
+   output reg [15:0]c_add;	
     
     reg    [15:0] Num_shift_80; 
     reg    [5:0]  Larger_exp_80,Final_expo_80;
