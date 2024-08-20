@@ -34,7 +34,7 @@ out_wrapper wrap2(clk,rst_n,c,c_byte);
 
 
 assign uo_out = c_byte[7:0];
-wire _unused = &{ena,1'b0};	
+//wire _unused = &{ena,1'b0};	
    
 endmodule
 
