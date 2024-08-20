@@ -273,66 +273,66 @@ module dlfloat_adder(input clk,input [15:0] a1, input [15:0] b1,output reg [15:0
 	  
         if (Add_mant_80[10] ) begin
 		   Add1_mant_80= Add_mant_80 >> 1;
-		renorm_exp_80[5:0] = 6'd1;
-		renorm_exp_80 = {{26{renorm_exp_80[5]}}, renorm_exp_80[5:0]};//sign extension to 32 bits
+		renorm_exp_80 = 6'd1;
+		//renorm_exp_80 = {{26{renorm_exp_80[5]}}, renorm_exp_80[5:0]};//sign extension to 32 bits
 	    end
         else begin 
            if (Add_mant_80[9])begin
 		     renorm_shift_80 = 0;
-		   renorm_exp_80[5:0] = 0;
-		   renorm_exp_80 = {{26{renorm_exp_80[5]}}, renorm_exp_80[5:0]};
+		   renorm_exp_80 = 0;
+		   //renorm_exp_80 = {{26{renorm_exp_80[5]}}, renorm_exp_80[5:0]};
 	       end
            else if (Add_mant_80[8])begin
 		     renorm_shift_80 = 8'd1; 
-		    renorm_exp_80[5:0] = -1;
-		    renorm_exp_80 = {{26{renorm_exp_80[5]}}, renorm_exp_80[5:0]};
+		    renorm_exp_80 = -1;
+		    //renorm_exp_80 = {{26{renorm_exp_80[5]}}, renorm_exp_80[5:0]};
 	        end 
            else if (Add_mant_80[7])begin
 		      renorm_shift_80 = 8'd2; 
-		   renorm_exp_80[5:0] = -2;
-		   renorm_exp_80 = {{26{renorm_exp_80[5]}}, renorm_exp_80[5:0]};
+		   renorm_exp_80 = -2;
+		   //renorm_exp_80 = {{26{renorm_exp_80[5]}}, renorm_exp_80[5:0]};
 	       end  
            else if (Add_mant_80[6])begin
 		      renorm_shift_80 = 8'd3; 
-		   renorm_exp_80[5:0] = -3;
-		   renorm_exp_80 = {{26{renorm_exp_80[5]}}, renorm_exp_80[5:0]};
+		   renorm_exp_80 = -3;
+		   //renorm_exp_80 = {{26{renorm_exp_80[5]}}, renorm_exp_80[5:0]};
 	       end
            else if (Add_mant_80[5])begin
 		      renorm_shift_80 = 8'd4; 
-		   renorm_exp_80[5:0] = -4;
-		   renorm_exp_80 = {{26{renorm_exp_80[5]}}, renorm_exp_80[5:0]};
+		   renorm_exp_80 = -4;
+		   //renorm_exp_80 = {{26{renorm_exp_80[5]}}, renorm_exp_80[5:0]};
 	       end
            else if (Add_mant_80[4])begin
 		      renorm_shift_80 = 8'd5; 
-		   renorm_exp_80[5:0] = -5;
-		   renorm_exp_80 = {{26{renorm_exp_80[5]}}, renorm_exp_80[5:0]};
+		   renorm_exp_80 = -5;
+		 //  renorm_exp_80 = {{26{renorm_exp_80[5]}}, renorm_exp_80[5:0]};
 	       end
            else if (Add_mant_80[3])begin
 		      renorm_shift_80 = 8'd6; 
-		   renorm_exp_80[5:0] = -6;
-		   renorm_exp_80 = {{26{renorm_exp_80[5]}}, renorm_exp_80[5:0]};
+		   renorm_exp_80  = -6;
+		   //renorm_exp_80 = {{26{renorm_exp_80[5]}}, renorm_exp_80[5:0]};
 	       end
            else if (Add_mant_80[2])begin
 		      renorm_shift_80 = 8'd7; 
-		   renorm_exp_80[5:0] = -7;
-		   renorm_exp_80 = {{26{renorm_exp_80[5]}}, renorm_exp_80[5:0]};
+		   renorm_exp_80 = -7;
+		   //renorm_exp_80 = {{26{renorm_exp_80[5]}}, renorm_exp_80[5:0]};
 	        end
            else if (Add_mant_80[1])begin
 		      renorm_shift_80 = 8'd8; 
-		   renorm_exp_80[5:0] = -8;
-		   renorm_exp_80 = {{26{renorm_exp_80[5]}}, renorm_exp_80[5:0]};
+		   renorm_exp_80 = -8;
+		 //  renorm_exp_80 = {{26{renorm_exp_80[5]}}, renorm_exp_80[5:0]};
 	        end
            else if (Add_mant_80[0])begin
 		      renorm_shift_80 = 8'd9; 
-		   renorm_exp_80[5:0] = -9;
-		   renorm_exp_80 = {{26{renorm_exp_80[5]}}, renorm_exp_80[5:0]};
+		   renorm_exp_80 = -9;
+		  // renorm_exp_80 = {{26{renorm_exp_80[5]}}, renorm_exp_80[5:0]};
 	        end
            Add1_mant_80 = Add_mant_80 << renorm_shift_80;
         
         end
      
         Final_expo_80 = 6'd0;//to avoid latch inference
-	  Final_expo_80 =  Larger_exp_80 + renorm_exp_80[5:0];
+	  Final_expo_80 =  Larger_exp_80 + renorm_exp_80;
 	 Final_mant_80 = 9'd0;//to avoid latch inference
         Final_mant_80 = Add1_mant_80[8:0]; 
 
