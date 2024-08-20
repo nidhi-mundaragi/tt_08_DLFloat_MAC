@@ -201,14 +201,14 @@ module dlfloat_adder(input clk,input [15:0] a1, input [15:0] b1,output reg [15:0
 	  Num_shift_80=16'b0;
 	  
           if (e1_80  > e2_80) begin
-		  Num_shift_80      = {10'b0,e1_80 - e2_80};
+		  Num_shift_80      = e1_80 - e2_80;
              Larger_exp_80          = e1_80;                     
              Small_exp_mantissa_80  = {1'b1,m2_80};
              Large_mantissa_80      = {1'b1,m1_80};
           end
         
           else begin
-		  Num_shift_80     = {10'b0,e2_80 - e1_80};
+		  Num_shift_80     = e2_80 - e1_80;
             Larger_exp_80          = e2_80;
             Small_exp_mantissa_80  = {1'b1,m1_80};
             Large_mantissa_80      = {1'b1,m2_80};
@@ -255,13 +255,13 @@ module dlfloat_adder(input clk,input [15:0] a1, input [15:0] b1,output reg [15:0
 	
 	    if (e1_80!=0 & e2_80!=0) begin
 		   if (s1_80 == s2_80) begin
-			   Add_mant_80 ={1'b0, S_mantissa_80 + L_mantissa_80};
+			   Add_mant_80 = S_mantissa_80 + L_mantissa_80;
 		    end else begin
-			    Add_mant_80 ={1'b0, L_mantissa_80 - S_mantissa_80};
+			    Add_mant_80 = L_mantissa_80 - S_mantissa_80;
 		    end
 	    end	
  	    else begin
-		    Add_mant_80 ={1'b0, L_mantissa_80};
+		    Add_mant_80 = L_mantissa_80;
 	    end
       
 	 //renormalization for mantissa and exponent
