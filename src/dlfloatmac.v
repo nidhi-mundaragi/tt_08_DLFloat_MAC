@@ -34,7 +34,6 @@ out_wrapper wrap2(clk,rst_n,c,c_byte);
 
 
 assign uo_out = c_byte[7:0];
-//wire _unused = &{ena,1'b0};	
    
 endmodule
 
@@ -92,11 +91,11 @@ reg [1:0] state;
     else begin
         case (state)
             2'b00: begin
-              c_byte <= c[7:0];
+		    c_byte <= c[7:0];
                 state <= 2'b01;
             end
             2'b01: begin
-              c_byte <= c[15:8]; 
+		    c_byte <= c[15:8]; 
                 state <= 2'b00;
             end
             default: state <= 2'b00; 
@@ -112,7 +111,7 @@ endmodule
   output reg [15:0]c_out;
   wire [15:0]fprod,fadd;
   
-always @(posedge clk or negedge rst_n) begin
+  always @(posedge clk) begin
     if(!rst_n) begin
       c_out<=0;
     end
@@ -139,7 +138,7 @@ module dlfloat_mult(a,b,c_mul,clk,rst_n);
     reg [16:0] temp;
     reg [15:0] c_mul1;
    
-always @(posedge clk or negedge rst_n) begin
+  always @(posedge clk) begin
     if(!rst_n) begin
       c_mul<=16'b0;
     end
@@ -201,14 +200,14 @@ module dlfloat_adder(input clk,input [15:0] a1, input [15:0] b1,output reg [15:0
 	  Num_shift_80=16'b0;
 	  
           if (e1_80  > e2_80) begin
-		  Num_shift_80      = e1_80 - e2_80;
+             Num_shift_80           = e1_80 - e2_80;
              Larger_exp_80          = e1_80;                     
              Small_exp_mantissa_80  = {1'b1,m2_80};
              Large_mantissa_80      = {1'b1,m1_80};
           end
         
           else begin
-		  Num_shift_80     = e2_80 - e1_80;
+            Num_shift_80           = e2_80 - e1_80;
             Larger_exp_80          = e2_80;
             Small_exp_mantissa_80  = {1'b1,m1_80};
             Large_mantissa_80      = {1'b1,m2_80};
@@ -255,84 +254,73 @@ module dlfloat_adder(input clk,input [15:0] a1, input [15:0] b1,output reg [15:0
 	
 	    if (e1_80!=0 & e2_80!=0) begin
 		   if (s1_80 == s2_80) begin
-			   Add_mant_80 = S_mantissa_80 + L_mantissa_80;
+        		Add_mant_80 = S_mantissa_80 + L_mantissa_80;
 		    end else begin
-			    Add_mant_80 = L_mantissa_80 - S_mantissa_80;
+			   Add_mant_80 = L_mantissa_80 - S_mantissa_80;
 		    end
 	    end	
  	    else begin
-		    Add_mant_80 = L_mantissa_80;
+		     Add_mant_80 = L_mantissa_80;
 	    end
       
 	 //renormalization for mantissa and exponent
      //stage 4
 	  //to avoid latch inference
-	   renorm_exp_80=32'd0;
+	   renorm_exp_80=4'd0;
 	   renorm_shift_80=9'd0;
 	   Add1_mant_80=Add1_mant_80;
 	  
         if (Add_mant_80[10] ) begin
 		   Add1_mant_80= Add_mant_80 >> 1;
-		renorm_exp_80 = 6'd1;
-		//renorm_exp_80 = {{26{renorm_exp_80[5]}}, renorm_exp_80[5:0]};//sign extension to 32 bits
+		   renorm_exp_80 = 4'd1;
 	    end
         else begin 
            if (Add_mant_80[9])begin
 		     renorm_shift_80 = 0;
-		   renorm_exp_80 = 0;
-		   //renorm_exp_80 = {{26{renorm_exp_80[5]}}, renorm_exp_80[5:0]};
+		     renorm_exp_80 = 0;		
 	       end
            else if (Add_mant_80[8])begin
 		     renorm_shift_80 = 8'd1; 
-		    renorm_exp_80 = -1;
-		    //renorm_exp_80 = {{26{renorm_exp_80[5]}}, renorm_exp_80[5:0]};
+		     renorm_exp_80 = -1;
 	        end 
            else if (Add_mant_80[7])begin
 		      renorm_shift_80 = 8'd2; 
-		   renorm_exp_80 = -2;
-		   //renorm_exp_80 = {{26{renorm_exp_80[5]}}, renorm_exp_80[5:0]};
+		      renorm_exp_80 = -2;		
 	       end  
            else if (Add_mant_80[6])begin
 		      renorm_shift_80 = 8'd3; 
-		   renorm_exp_80 = -3;
-		   //renorm_exp_80 = {{26{renorm_exp_80[5]}}, renorm_exp_80[5:0]};
+		      renorm_exp_80 = -3;		
 	       end
            else if (Add_mant_80[5])begin
 		      renorm_shift_80 = 8'd4; 
-		   renorm_exp_80 = -4;
-		   //renorm_exp_80 = {{26{renorm_exp_80[5]}}, renorm_exp_80[5:0]};
+		      renorm_exp_80 = -4;		
 	       end
            else if (Add_mant_80[4])begin
 		      renorm_shift_80 = 8'd5; 
-		   renorm_exp_80 = -5;
-		 //  renorm_exp_80 = {{26{renorm_exp_80[5]}}, renorm_exp_80[5:0]};
+		      renorm_exp_80 = -5;		
 	       end
            else if (Add_mant_80[3])begin
 		      renorm_shift_80 = 8'd6; 
-		   renorm_exp_80  = -6;
-		   //renorm_exp_80 = {{26{renorm_exp_80[5]}}, renorm_exp_80[5:0]};
+		      renorm_exp_80 = -6;		
 	       end
            else if (Add_mant_80[2])begin
 		      renorm_shift_80 = 8'd7; 
-		   renorm_exp_80 = -7;
-		   //renorm_exp_80 = {{26{renorm_exp_80[5]}}, renorm_exp_80[5:0]};
+		      renorm_exp_80 = -7;		
 	        end
            else if (Add_mant_80[1])begin
 		      renorm_shift_80 = 8'd8; 
-		   renorm_exp_80 = -8;
-		 //  renorm_exp_80 = {{26{renorm_exp_80[5]}}, renorm_exp_80[5:0]};
+		      renorm_exp_80 = -8;		
 	        end
            else if (Add_mant_80[0])begin
 		      renorm_shift_80 = 8'd9; 
-		   renorm_exp_80 = -9;
-		  // renorm_exp_80 = {{26{renorm_exp_80[5]}}, renorm_exp_80[5:0]};
+		      renorm_exp_80 = -9;		
 	        end
            Add1_mant_80 = Add_mant_80 << renorm_shift_80;
         
         end
      
         Final_expo_80 = 6'd0;//to avoid latch inference
-	  Final_expo_80 =  Larger_exp_80 + renorm_exp_80;
+        Final_expo_80 =  Larger_exp_80 + renorm_exp_80;
 	 Final_mant_80 = 9'd0;//to avoid latch inference
         Final_mant_80 = Add1_mant_80[8:0]; 
 
@@ -341,7 +329,7 @@ module dlfloat_adder(input clk,input [15:0] a1, input [15:0] b1,output reg [15:0
 		  Final_sign_80 = s1_80;
 	   end 
 
-	  if (e1_80 > e2_80) begin
+	   if (e1_80 > e2_80) begin
 		  Final_sign_80 = s1_80;	
 	   end else if (e2_80 > e1_80) begin
 		  Final_sign_80 = s2_80;
