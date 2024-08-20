@@ -51,7 +51,7 @@ reg [15:0] temp_data;
 
   always @(posedge clk or negedge rst_n) begin
     if (!rst_n) begin
-        state <= 2'b01; 
+        state <= 2'b00; 
         reg_a <= 16'b0;
         reg_b <= 16'b0;
         temp_data <= 16'b0;
