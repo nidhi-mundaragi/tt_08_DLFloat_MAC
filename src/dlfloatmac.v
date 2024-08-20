@@ -341,7 +341,7 @@ module dlfloat_adder(input clk,input [15:0] a1, input [15:0] b1,output reg [15:0
 		  Final_sign_80 = s1_80;
 	   end 
 
-	   if (e1_80 > e2_80) begin
+	  if (e1_80 > e2_80) begin
 		  Final_sign_80 = s1_80;	
 	   end else if (e2_80 > e1_80) begin
 		  Final_sign_80 = s2_80;
