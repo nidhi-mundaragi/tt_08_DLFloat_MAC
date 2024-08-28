@@ -346,7 +346,7 @@ module dlfloat_adder(input clk,input [15:0] a1, input [15:0] b1,output reg [15:0
 	   if (s1_80 == s2_80) begin
 		  Final_sign_80 = s1_80;
 	   end 
-
+         
 	   if (e1_80 > e2_80) begin
 		  Final_sign_80 = s1_80;	
 	   end else if (e2_80 > e1_80) begin
@@ -356,10 +356,15 @@ module dlfloat_adder(input clk,input [15:0] a1, input [15:0] b1,output reg [15:0
 
 		if (m1_80 > m2_80) begin
 			Final_sign_80 = s1_80;		
-		end else begin
+		end else if (m1_80 < m2_80) begin
 			Final_sign_80 = s2_80;
 		end
-      end	
+		  else begin
+		       Final_sign_80 = 0;
+		end	  
+        end
+	  
+      //checking for special cases
       if( a1==16'hFFFF | b1==16'hFFFF) begin
         c_add = 16'hFFFF;
       end
