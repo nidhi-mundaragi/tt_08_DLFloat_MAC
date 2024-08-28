@@ -156,6 +156,14 @@ always@(*) begin
         sb = b[15];
         ea = a[14:9];
         eb = b[14:9];
+	
+       //to avoid latch inference
+	e_temp = 6'b0;
+	m_temp = 20'b0;
+	mant=9'b0;
+	exp= 6'b0;
+	s=0;
+	
 	//checking for underflow/overflow
         if ( (ea + eb) <= 31) begin
           c_mul1=16'b0;
@@ -163,15 +171,14 @@ always@(*) begin
         else if ( (ea + eb) >= 94) begin
           c_mul1=16'hFFFF;
         end
-        else begin
-	e_temp = 6'b0;//to avoid latch inference	
+        else begin	
         e_temp = ea + eb - 31;
         m_temp = ma * mb;
 		
         mant = m_temp[19] ? m_temp[18:10] : m_temp[17:9];
-        exp = m_temp[19] ? e_temp+1'b1 : e_temp;
-		
+        exp = m_temp[19] ? e_temp+1'b1 : e_temp;	
         s=sa ^ sb;
+		
 	//checking for special cases	
          if( a==16'hFFFF | b==16'hFFFF ) begin
             c_mul1 =16'hFFFF;
