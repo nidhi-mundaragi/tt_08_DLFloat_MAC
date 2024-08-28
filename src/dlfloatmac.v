@@ -149,14 +149,21 @@ module dlfloat_mult(a,b,c_mul,clk,rst_n);
     end
   end	
 	
-	always@(*) begin
+always@(*) begin
         ma ={1'b1,a[8:0]};
         mb= {1'b1,b[8:0]};
         sa = a[15];
         sb = b[15];
         ea = a[14:9];
         eb = b[14:9];
-	
+	//checking for underflow/overflow
+        if ( (ea + eb) <= 31) begin
+          c_mul1=16'b0;
+        end
+        else if ( (ea + eb) >= 94) begin
+          c_mul1=16'hFFFF;
+        end
+        else begin	
         e_temp = ea + eb - 31;
         m_temp = ma * mb;
 		
@@ -164,13 +171,14 @@ module dlfloat_mult(a,b,c_mul,clk,rst_n);
         exp = m_temp[19] ? e_temp+1'b1 : e_temp;
 		
         s=sa ^ sb;
+	//checking for special cases	
          if( a==16'hFFFF | b==16'hFFFF ) begin
-        c_mul1 =16'hFFFF;
-      end
-      else begin
-        c_mul1 = (a==0 | b==0) ? 0 :{s,exp,mant};
-      end 
- 
+            c_mul1 =16'hFFFF;
+         end
+        else begin
+           c_mul1 = (a==0 | b==0) ? 0 :{s,exp,mant};
+         end 
+	end 
     end 
 endmodule 
 
