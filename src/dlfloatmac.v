@@ -163,7 +163,8 @@ always@(*) begin
         else if ( (ea + eb) >= 94) begin
           c_mul1=16'hFFFF;
         end
-        else begin	
+        else begin
+	e_temp = 6'b0;//to avoid latch inference	
         e_temp = ea + eb - 31;
         m_temp = ma * mb;
 		
