@@ -340,10 +340,10 @@ module dlfloat_adder(input clk,input [15:0] a1, input [15:0] b1,output reg [15:0
 
            //checking for overflow/underflow
            if(  Larger_exp_80 == 63 && renorm_exp_80 == 1) begin //overflow
-                c=16'h7DFE;//largest +ve value
+                c_add=16'h7DFE;//largest +ve value
            end
            else if ((Larger_exp_80 >= 1) && (Larger_exp_80 <= 8) && (renorm_exp_80 < -Larger_exp_80)) begin //underflow
-               c=16'd513;//smallest +ve value
+               c_add=16'd513;//smallest +ve value
             end 
            else begin
       	   
@@ -351,10 +351,10 @@ module dlfloat_adder(input clk,input [15:0] a1, input [15:0] b1,output reg [15:0
                Final_expo_80 =  Larger_exp_80 + renorm_exp_80;
       
       	       if(Final_expo_80 == 6'b0) begin
-                     c=16'b0;
+                     c_add=16'b0;
                end
                else if( Final_expo_80 == 63) begin
-                     c=16'hFFFF;
+                     c_add=16'hFFFF;
                end      
 	      
 	       Final_mant_80 = 9'd0;//to avoid latch inference
