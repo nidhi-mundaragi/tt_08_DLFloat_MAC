@@ -165,12 +165,18 @@ always@(*) begin
 	s=0;
 	
 	//checking for underflow/overflow
-        if ( (ea + eb) <= 31) begin
-          c_mul1=16'b0;
+        if ( (ea + eb) < 31) begin
+          c_mul1=16'd513;//pushing to smallest +ve number on underflow
         end
-        else if ( (ea + eb) >= 94) begin
-          c_mul1=16'hFFFF;
+	else if (  (ea + eb) == 31 ) begin
+		c_mul1=16'b0;//pushing to zero if exp is all zeros
+	end
+        else if ( (ea + eb) > 94) begin
+          c_mul1=16'h7DFE;//pushing to largest +ve number on overflow
         end
+	else if ( (ea + eb) == 94 ) begin
+		c_mul1=16'hFFFF;//pushing to inf if exp is all ones
+	end
         else begin	
         e_temp = ea + eb - 31;
         m_temp = ma * mb;
@@ -233,27 +239,16 @@ module dlfloat_adder(input clk,input [15:0] a1, input [15:0] b1,output reg [15:0
  
 	      if (e1_80 == 0 | e2_80 ==0) begin
 	        Num_shift_80 = 0;
+	       Small_exp_mantissa_80 = 10'd512; //to avoid subnormal mantissa to be greater than normal mantissa pushing it to all zeros and leading 1      
 	      end
 	      else begin
 	        Num_shift_80 = Num_shift_80;
 	      end
       
         
-        //stage 2
-        // append 1 and shift
-	    if (e1_80 != 0) begin
-	      Small_exp_mantissa_80  = (Small_exp_mantissa_80 >> Num_shift_80);
-        end
-	    else begin
-	      Small_exp_mantissa_80 = Small_exp_mantissa_80;
-	    end
-
-	    if (e2_80!= 0) begin
-            Large_mantissa_80 = Large_mantissa_80;
-	    end
-	    else begin
-	       Large_mantissa_80 = Large_mantissa_80;
-	    end	
+        //stage 2 
+        //shift and append smaller mantissa
+	 Small_exp_mantissa_80  = (Small_exp_mantissa_80 >> Num_shift_80);
               
        //stage 3
        //add the mantissas
@@ -336,41 +331,60 @@ module dlfloat_adder(input clk,input [15:0] a1, input [15:0] b1,output reg [15:0
            Add1_mant_80 = Add_mant_80 << renorm_shift_80;
         
         end
-     
-        Final_expo_80 = 6'd0;//to avoid latch inference
-        Final_expo_80 =  Larger_exp_80 + renorm_exp_80;
-	 Final_mant_80 = 9'd0;//to avoid latch inference
-        Final_mant_80 = Add1_mant_80[8:0]; 
 
-	  Final_sign_80=0;//to avoid latch inference
-	   if (s1_80 == s2_80) begin
-		  Final_sign_80 = s1_80;
-	   end 
-         
-	   if (e1_80 > e2_80) begin
-		  Final_sign_80 = s1_80;	
-	   end else if (e2_80 > e1_80) begin
-		  Final_sign_80 = s2_80;
-	   end
-	  else begin
-
-		if (m1_80 > m2_80) begin
-			Final_sign_80 = s1_80;		
-		end else if (m1_80 < m2_80) begin
-			Final_sign_80 = s2_80;
-		end
-		  else begin
-		       Final_sign_80 = 0;
-		end	  
-        end
-	  
-      //checking for special cases
-      if( a1==16'hFFFF | b1==16'hFFFF) begin
-        c_add = 16'hFFFF;
+     //checking for overflow/underflow
+      if(  Larger_exp_80 == 63 && renorm_exp_80 == 1) begin //overflow
+           c=16'h7DFE;//largest +ve value
       end
-      else begin
-        c_add = (a1==0 & b1==0)?0:{Final_sign_80,Final_expo_80,Final_mant_80};
+      else if ((Larger_exp_80 >= 1) && (Larger_exp_80 <= 8) && (renorm_exp_80 < -Larger_exp_80)) begin //underflow
+            c=16'd513;//smallest +ve value
       end 
-    end 
-    
+      else begin
+      	  
+           Final_expo_80 = 6'd0;//to avoid latch inference
+           Final_expo_80 =  Larger_exp_80 + renorm_exp_80;
+      
+      	   if(Final_expo_80 == 6'b0) begin
+               c=16'b0;
+           end
+           else if( Final_expo_80 == 63) begin
+               c=16'hFFFF;
+           end      
+	      
+	    Final_mant_80 = 9'd0;//to avoid latch inference
+            Final_mant_80 = Add1_mant_80[8:0]; 
+
+	    Final_sign_80=0;//to avoid latch inference
+	      if (s1_80 == s2_80) begin
+		  Final_sign_80 = s1_80;
+	       end 
+         
+	      if (e1_80 > e2_80) begin
+		  Final_sign_80 = s1_80;	
+	      end 
+	      else if (e2_80 > e1_80) begin
+		  Final_sign_80 = s2_80;
+	      end
+	       else begin
+
+		  if (m1_80 > m2_80) begin
+			Final_sign_80 = s1_80;		
+		  end
+		  else if (m1_80 < m2_80) begin
+			Final_sign_80 = s2_80;
+		   end
+		   else begin
+		       Final_sign_80 = 0;
+		   end	  
+                end
+	        
+             //checking for special cases
+              if( a1==16'hFFFF | b1==16'hFFFF) begin
+                 c_add = 16'hFFFF;
+              end
+              else begin
+                 c_add = (a1==0 & b1==0)?0:{Final_sign_80,Final_expo_80,Final_mant_80};
+              end 
+       end//for overflow/underflow 
+  end  
 endmodule
