@@ -4,7 +4,6 @@
  */
 
 `default_nettype none
-
 module tt_um_dlfloatmac (
     input  wire [7:0] ui_in,    // Dedicated inputs
     output wire [7:0] uo_out,   // Dedicated outputs
@@ -165,15 +164,18 @@ module dlfloat_mult(a,b,c_mul,clk,rst_n);
   	s=0;
   	
   	//checking for underflow/overflow
-        if ( (ea + eb) < 31) begin
-          c_mul1=16'd513;//pushing to smallest +ve number on underflow
-        end
-  	else if (  (ea + eb) == 31 ) begin
-  		c_mul1=16'b0;//pushing to zero if exp is all zeros
+    if (  (ea + eb) <= 31 ) begin
+  	c_mul1=16'b0;//pushing to zero on underflow
   	end
-        else if ( (ea + eb) > 94) begin
+    else if ( (ea + eb) > 94) begin
+      if( (sa ^ sb) ) begin
           c_mul1=16'h7DFE;//pushing to largest +ve number on overflow
         end
+      else begin
+          c_mul1=16'hFDFE;//pushing to largest -ve number on overflow
+      end
+    end
+        
   	else if ( (ea + eb) == 94 ) begin
 		c_mul1=16'hFFFF;//pushing to inf if exp is all ones
  	end
@@ -209,7 +211,7 @@ module dlfloat_adder(input clk,input [15:0] a1, input [15:0] b1,output reg [15:0
     reg          s1_80,s2_80,Final_sign_80;
     reg    [8:0]  renorm_shift_80;
     reg signed [5:0] renorm_exp_80;
-   	
+   	reg signed [5:0] larger_expo_neg;
    
     
     always@(*) begin
@@ -282,7 +284,7 @@ module dlfloat_adder(input clk,input [15:0] a1, input [15:0] b1,output reg [15:0
 	   renorm_exp_80=6'd0;
 	   renorm_shift_80=9'd0;
 	   Add1_mant_80=Add1_mant_80;
-	  
+	   
            if (Add_mant_80[10] ) begin
 		   Add1_mant_80= Add_mant_80 >> 1;
 		   renorm_exp_80 = 6'd1;
@@ -339,14 +341,52 @@ module dlfloat_adder(input clk,input [15:0] a1, input [15:0] b1,output reg [15:0
           end
 
           Final_expo_80 = 6'd0;//to avoid latch inference
-	  Final_mant_80 = 9'd0;//to avoid latch inference  
-	  Final_sign_80=0;//to avoid latch inference 
+	      Final_mant_80 = 9'd0;//to avoid latch inference  
+	      Final_sign_80=0;//to avoid latch inference 
+          larger_expo_neg = -Larger_exp_80;
+      
+        //calculating final sign	   
+	       if (s1_80 == s2_80) begin
+		     Final_sign_80 = s1_80;
+	       end 
+	       else begin   //if sign is different
+	          if (e1_80 > e2_80) begin
+	       	     Final_sign_80 = s1_80;	
+	          end 
+	          else if (e2_80 > e1_80) begin
+		     Final_sign_80 = s2_80;
+	          end
+	          else begin
+                     if (m1_80 > m2_80) begin
+			            Final_sign_80 = s1_80;		
+		             end
+		            else if (m1_80 < m2_80) begin
+			           Final_sign_80 = s2_80;
+		            end
+		           else begin
+		              Final_sign_80 = 0;
+		           end	  
+                 end
+	       end
+      
+         
            //checking for overflow/underflow
-           if(  Larger_exp_80 == 63 && renorm_exp_80 == 1) begin //overflow
+           if(  Larger_exp_80 == 63 & renorm_exp_80 == 1) begin //overflow
+             if (  Final_sign_80 ) begin
                 c_add=16'h7DFE;//largest +ve value
+             end
+             else begin
+               c_add=16'hFDFE;//largest -ve value
+             end
+  
            end
-           else if ((Larger_exp_80 >= 1) && (Larger_exp_80 <= 8) && (renorm_exp_80 < -Larger_exp_80)) begin //underflow
+           else if ((Larger_exp_80 >= 1) & (Larger_exp_80 <= 8) & (renorm_exp_80 <  larger_expo_neg)) begin //underflow
+             if (  Final_sign_80 ) begin
                c_add=16'd513;//smallest +ve value
+               end
+             else begin
+               c_add=16'h8201;//smallest -ve value
+             end
             end 
            else begin
       	   
@@ -360,29 +400,7 @@ module dlfloat_adder(input clk,input [15:0] a1, input [15:0] b1,output reg [15:0
                end      
 	      
                Final_mant_80 = Add1_mant_80[8:0]; 
-	       //calculating final sign	   
-	       if (s1_80 == s2_80) begin
-		  Final_sign_80 = s1_80;
-	       end 
-	       else begin   //if sign is different
-	          if (e1_80 > e2_80) begin
-	       	     Final_sign_80 = s1_80;	
-	          end 
-	          else if (e2_80 > e1_80) begin
-		     Final_sign_80 = s2_80;
-	          end
-	          else begin
-                     if (m1_80 > m2_80) begin
-			Final_sign_80 = s1_80;		
-		     end
-		     else if (m1_80 < m2_80) begin
-			Final_sign_80 = s2_80;
-		     end
-		     else begin
-		       Final_sign_80 = 0;
-		     end	  
-                  end
-	       end
+	       
                //checking for special cases
                if( a1==16'hFFFF | b1==16'hFFFF) begin
                  c_add = 16'hFFFF;
