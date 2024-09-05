@@ -137,7 +137,6 @@ module dlfloat_mult(a,b,c_mul,clk,rst_n);
     reg [19:0]m_temp; //after multiplication
     reg [5:0] ea,eb,e_temp,exp;
     reg sa,sb,s;
-    reg [16:0] temp;
     reg [15:0] c_mul1;
    
   always @(posedge clk or negedge rst_n) begin
@@ -183,7 +182,7 @@ module dlfloat_mult(a,b,c_mul,clk,rst_n);
         else begin	
         e_temp = ea + eb - 31;
         m_temp = ma * mb;
- 		
+	m_temp[8:0] = 9'b0;	
         mant = m_temp[19] ? m_temp[18:10] : m_temp[17:9];
         exp = m_temp[19] ? e_temp+1'b1 : e_temp;	
         s=sa ^ sb;
@@ -199,7 +198,7 @@ module dlfloat_mult(a,b,c_mul,clk,rst_n);
     end 
 endmodule 
  
-module dlfloat_adder(input clk,input [15:0] a1, input [15:0] b1,output reg [15:0] c_add=0);
+module dlfloat_adder(input [15:0] a1, input [15:0] b1,output reg [15:0] c_add);
    
    	
     reg    [5:0] Num_shift_80; 
@@ -212,7 +211,7 @@ module dlfloat_adder(input clk,input [15:0] a1, input [15:0] b1,output reg [15:0
     reg          s1_80,s2_80,Final_sign_80;
     reg    [8:0]  renorm_shift_80;
     reg signed [5:0] renorm_exp_80;
-   	reg signed [5:0] larger_expo_neg;
+    reg signed [5:0] larger_expo_neg;
    
     
     always@(*) begin
@@ -224,7 +223,7 @@ module dlfloat_adder(input clk,input [15:0] a1, input [15:0] b1,output reg [15:0
              s1_80 = a1[15];
        	     s2_80 = b1[15];
         
-	    Num_shift_80=16'b0;
+	    Num_shift_80=6'b0;
 	  
            if (e1_80  > e2_80) begin
               Num_shift_80           = e1_80 - e2_80;
@@ -276,7 +275,7 @@ module dlfloat_adder(input clk,input [15:0] a1, input [15:0] b1,output reg [15:0
 		    end
 	    end	
  	    else begin
-		     Add_mant_80 = L_mantissa_80;
+		    Add_mant_80 ={1'b0, L_mantissa_80};
 	    end
       
 	   //renormalization for mantissa and exponent
