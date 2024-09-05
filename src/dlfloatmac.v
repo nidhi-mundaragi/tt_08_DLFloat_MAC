@@ -138,7 +138,7 @@ module dlfloat_mult(a,b,c_mul,clk,rst_n);
     reg [5:0] ea,eb,e_temp,exp;
     reg sa,sb,s;
     reg [15:0] c_mul1;
-   
+	
   always @(posedge clk or negedge rst_n) begin
     if(!rst_n) begin
       c_mul<=16'b0;
@@ -186,7 +186,7 @@ module dlfloat_mult(a,b,c_mul,clk,rst_n);
         mant = m_temp[19] ? m_temp[18:10] : m_temp[17:9];
         exp = m_temp[19] ? e_temp+1'b1 : e_temp;	
         s=sa ^ sb;
-	m_temp[8:0] = 9'b0;	
+		
  	//checking for special cases	
          if( a==16'hFFFF | b==16'hFFFF ) begin
             c_mul1 =16'hFFFF;
@@ -196,6 +196,7 @@ module dlfloat_mult(a,b,c_mul,clk,rst_n);
          end 
  	end 
     end 
+	wire _unused = &{m_temp[8:0], 9'b0};
 endmodule 
  
 module dlfloat_adder(input [15:0] a1, input [15:0] b1,output reg [15:0] c_add);
