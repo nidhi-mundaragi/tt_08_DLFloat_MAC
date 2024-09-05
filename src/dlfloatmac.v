@@ -4,6 +4,7 @@
  */
 
 `default_nettype none
+
 module tt_um_dlfloatmac (
     input  wire [7:0] ui_in,    // Dedicated inputs
     output wire [7:0] uo_out,   // Dedicated outputs
@@ -165,14 +166,14 @@ module dlfloat_mult(a,b,c_mul,clk,rst_n);
   	
   	//checking for underflow/overflow
     if (  (ea + eb) <= 31 ) begin
-  	c_mul1=16'b0;//pushing to zero on underflow
+  		c_mul1=16'b0;//pushing to zero on underflow
   	end
     else if ( (ea + eb) > 94) begin
       if( (sa ^ sb) ) begin
-          c_mul1=16'h7DFE;//pushing to largest +ve number on overflow
+          c_mul1=16'hFDFE;//pushing to largest -ve number on overflow
         end
       else begin
-          c_mul1=16'hFDFE;//pushing to largest -ve number on overflow
+          c_mul1=16'h7DFE;//pushing to largest +ve number on overflow
       end
     end
         
@@ -341,8 +342,8 @@ module dlfloat_adder(input clk,input [15:0] a1, input [15:0] b1,output reg [15:0
           end
 
           Final_expo_80 = 6'd0;//to avoid latch inference
-	      Final_mant_80 = 9'd0;//to avoid latch inference  
-	      Final_sign_80=0;//to avoid latch inference 
+	  Final_mant_80 = 9'd0;//to avoid latch inference  
+	  Final_sign_80=0;//to avoid latch inference 
           larger_expo_neg = -Larger_exp_80;
       
         //calculating final sign	   
@@ -373,19 +374,19 @@ module dlfloat_adder(input clk,input [15:0] a1, input [15:0] b1,output reg [15:0
            //checking for overflow/underflow
            if(  Larger_exp_80 == 63 & renorm_exp_80 == 1) begin //overflow
              if (  Final_sign_80 ) begin
-                c_add=16'h7DFE;//largest +ve value
+                c_add=16'hFDFE;//largest -ve value
              end
              else begin
-               c_add=16'hFDFE;//largest -ve value
+               c_add=16'h7DFE;//largest +ve value
              end
   
            end
            else if ((Larger_exp_80 >= 1) & (Larger_exp_80 <= 8) & (renorm_exp_80 <  larger_expo_neg)) begin //underflow
              if (  Final_sign_80 ) begin
-               c_add=16'd513;//smallest +ve value
+               c_add=16'h8201;//smallest -ve value
                end
              else begin
-               c_add=16'h8201;//smallest -ve value
+               c_add=16'd513;//smallest +ve value
              end
             end 
            else begin
