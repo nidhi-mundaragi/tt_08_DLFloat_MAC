@@ -123,7 +123,7 @@ module dlfloat_mac(clk,rst_n,a,b,c_out);
   end
   	
   dlfloat_mult mul(a,b,fprod,clk,rst_n);
-  dlfloat_adder add(clk,fprod,c_out,fadd);
+  dlfloat_adder add(fprod,c_out,fadd);
   
 endmodule 
   
@@ -182,11 +182,11 @@ module dlfloat_mult(a,b,c_mul,clk,rst_n);
         else begin	
         e_temp = ea + eb - 31;
         m_temp = ma * mb;
-	m_temp[8:0] = 9'b0;	
+		
         mant = m_temp[19] ? m_temp[18:10] : m_temp[17:9];
         exp = m_temp[19] ? e_temp+1'b1 : e_temp;	
         s=sa ^ sb;
- 		
+	m_temp[8:0] = 9'b0;	
  	//checking for special cases	
          if( a==16'hFFFF | b==16'hFFFF ) begin
             c_mul1 =16'hFFFF;
