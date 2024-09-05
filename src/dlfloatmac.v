@@ -216,14 +216,6 @@ module dlfloat_adder(input clk,input [15:0] a1, input [15:0] b1,output reg [15:0
    
     
     always@(*) begin
-	//checking for special cases
-        if( a1==16'hFFFF | b1==16'hFFFF) begin
-                 c_add = 16'hFFFF;
-        end 
-	    else if(a1==0 & b1==0) begin
-		    c_add =16'b0;
-	    end
-	    else begin
         //stage 1
      	     e1_80 = a1[14:9];
     	     e2_80 = b1[14:9];
@@ -408,10 +400,15 @@ module dlfloat_adder(input clk,input [15:0] a1, input [15:0] b1,output reg [15:0
                      c_add=16'hFFFF;
                end      
 	      
-               Final_mant_80 = Add1_mant_80[8:0];
-                c_add ={Final_sign_80,Final_expo_80,Final_mant_80};
+               Final_mant_80 = Add1_mant_80[8:0]; 
+	       
+               //checking for special cases
+               if( a1==16'hFFFF | b1==16'hFFFF) begin
+                 c_add = 16'hFFFF;
+               end
+               else begin
+                 c_add = (a1==0 & b1==0)?0:{Final_sign_80,Final_expo_80,Final_mant_80};
                end 
            end//for overflow/underflow 
-    end//for else block
   end //for always block 
 endmodule
